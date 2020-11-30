@@ -45,3 +45,40 @@ class RelPath:
       assert not i == self.all_paths[len(self.all_paths)-1], Exception('Error moving file\n')
     
     return True
+  
+  def move_to_rel(self, filename, accordance:list) -> str: # this will move a file to the most relative path according to the info you give it
+
+    # path_max_length = max amount of directories to find
+    # path_min_length = min amount of directories to find
+
+    # if the program finds a directory path in bettween the path_max_length and the path_min_length, it will pick that path and return it as a string.
+
+    path_max_length = -1
+    path_min_length = -1 # both negative one for error checking
+    if isinstance(accordance,list):
+      assert len(accordance) == 2, Exception(f'List length too long. Expected 2 values, got {len(accordance)}')
+
+      assert isinstance(accordance[0],int) and isinstance(accordance[1],int), Exception(f'Expected list of integers, instead got {type(accordance[0])}')
+
+      if accordance[0] > accordance[1]:
+        path_max_length = accordance[0]
+        path_min_length = accordance[1]
+      else:
+        path_max_length = accordance[1]
+        path_min_length = accordance[0]
+      
+      all_appended_paths = []
+      index = 0
+
+      for i in self.all_paths:
+
+        curr = os.path.abspath(i).split('/')
+        all_appended_paths.append(os.path.abspath(i))
+        
+        if len(curr) > path_max_length:
+          del all_appended_paths[len(all_appended_paths)-1]
+        if len(curr) <= path_max_length and len(curr) > path_min_length:
+          # we will then loop through the paths to find most relative one
+          pass
+        if not len(curr) <= path_max_length or len(curr) < path_min_length:
+          return '' # just return a empty string.
