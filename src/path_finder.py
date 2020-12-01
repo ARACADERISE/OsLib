@@ -6,7 +6,7 @@
   move(filename, to_dir) -> moves the file(filename), if it exists, into a directory(to_dir), if it exists
     - move will assert an Exception or a FileExistsError if either the directory was not found or the file was not found
 """
-import os
+import os, random
 
 class RelPath:
 
@@ -21,7 +21,7 @@ class RelPath:
       if key in i: paths.append(os.path.abspath(i))
     return paths
   
-  def rel_file(self, key, dir) -> list: # find relative filenames depending on a directory
+  def rel_file(self, key, dir, retDirPath = False) -> list: # find relative filenames depending on a directory
 
     files = []
     for i in self.all_paths:
@@ -29,7 +29,9 @@ class RelPath:
       if i == dir:
         for (_,_,filenames) in os.walk(i):
           for x in filenames:
-            if key in x: files.append(x)
+            if key in x:
+              if retDirPath == False: files.append(x)
+              else: files.append(os.path.abspath(x))
       
     return files
   
@@ -67,18 +69,45 @@ class RelPath:
         path_max_length = accordance[1]
         path_min_length = accordance[0]
       
-      all_appended_paths = []
-      index = 0
+      dir_depth_info = {}
+      
 
       for i in self.all_paths:
 
         curr = os.path.abspath(i).split('/')
-        all_appended_paths.append(os.path.abspath(i))
-        
-        if len(curr) > path_max_length:
-          del all_appended_paths[len(all_appended_paths)-1]
-        if len(curr) <= path_max_length and len(curr) > path_min_length:
-          # we will then loop through the paths to find most relative one
-          pass
-        if not len(curr) <= path_max_length or len(curr) < path_min_length:
+
+        if len(curr) <= path_max_length and len(curr) >= path_min_length:
+          full_path = ""
+          for i in range(len(curr)):
+            if i == len(curr)-1:
+              full_path += f"{curr[i]}"
+              break
+            full_path += f"{curr[i]}/"
+          
+          dir_depth = 0
+          for i in range(len(full_path)):
+            if full_path[i] == '/':dir_depth+=1
+          
+          dir_depth_info.update({full_path:dir_depth})
+          #if dir_depth > 0:
+           # if dir_depth <= path_max_length and dir_depth >= path_min_length:
+           #   return full_path
+        if len(curr) > path_max_length or len(curr) < path_min_length:
           return '' # just return a empty string.
+      
+      most_rel_lengths = []
+      index = 0
+      for i in dir_depth_info:
+        if index != len(dir_depth_info)-1:
+          if index == 1:
+            if dir_depth_info[i] < most_rel_lengths[index-1]:
+              continue
+            if dir_depth_info[i] > most_rel_lengths[index-1]:
+              del most_rel_lengths[index-1]
+              most_rel_lengths.append(dir_depth_info[i])
+          else:
+            most_rel_lengths.append(dir_depth_info[i])
+        
+      for i in dir_depth_info:
+        if dir_depth_info[i] == most_rel_lengths[0]:
+          return i

@@ -10,5 +10,5 @@ try:
 except Exception or FileExistsError as err:
   pass
 
-paths.move_to_rel('src/srcbruh',[1,2])
+print(paths.move_to_rel('src/srcbruh',[1,5]))
 print(paths_,files)
