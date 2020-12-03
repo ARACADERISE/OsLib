@@ -7,7 +7,7 @@ files = paths.rel_file('p','src')
 
 try:
   paths.move('srcbruhfff','src')
-except Exception or FileExistsError as err:
+except Exception or FileExistsError:
   pass
 
 print(paths.move_to_rel('src/srcbruh',[1,5]))

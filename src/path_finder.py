@@ -107,7 +107,16 @@ class RelPath:
               most_rel_lengths.append(dir_depth_info[i])
           else:
             most_rel_lengths.append(dir_depth_info[i])
-        
-      for i in dir_depth_info:
-        if dir_depth_info[i] == most_rel_lengths[0]:
-          return i
+      
+      if len(most_rel_lengths) > 0:
+        all_ = []
+        for i in dir_depth_info:
+          if index != len(dir_depth_info)-1:
+            if dir_depth_info[i] == most_rel_lengths[0]:
+              all_.append(i)
+              if index > 0:
+                if len(i) > all_[index-1]:
+                  return all_[index-1]
+                else:
+                  index += 1
+                  continue
